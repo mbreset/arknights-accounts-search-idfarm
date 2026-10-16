@@ -46,12 +46,12 @@ const tests = [
   ['Only IDFarm purchase links and final prices are displayed', async () => {
     await mount()
     assert(document.querySelector('.site-footer a').href === 'https://idfarm.co.kr/ItemMarket/gameItem/1543613', 'Footer purchase target changed')
-    assert(document.querySelector('.price-block').textContent === '아이디팜 최종 결제가10,500원', 'List must show final price only')
+    assert(document.querySelector('.price-block').textContent === '10,500원', 'List must show only the amount')
     await act(() => document.querySelector('.account-row').click())
     const links = [...document.querySelectorAll('a')]
     assert(links.length === 2 && links.every(a => a.href === 'https://idfarm.co.kr/ItemMarket/gameItem/1543613'), 'Only IDFarm links are allowed')
     assert(document.querySelectorAll('.modal-price-strip strong').length === 1, 'Modal must show one price')
-    assert(document.querySelector('.modal-price-strip').textContent === '아이디팜 최종 결제가10,500원수수료 5% 적용', 'Modal final price incorrect')
+    assert(document.querySelector('.modal-price-strip').textContent === '10,500원', 'Modal must show only the amount')
     assert(!document.body.textContent.includes('오픈카톡'), 'Kakao price label remains')
     assert(!document.querySelector('a[href*="kakao"]'), 'Kakao link remains')
     await click('닫기')

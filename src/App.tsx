@@ -120,7 +120,7 @@ function AccountModal({ account, sprite, onClose }: { account: PublicAccount; sp
         </header>
 
         <div className="modal-price-strip">
-          <div><span>아이디팜 최종 결제가</span><strong>{formatPrice(idFarmPrice(account.price))}</strong><small>수수료 5% 적용</small></div>
+          <div><strong>{formatPrice(idFarmPrice(account.price))}</strong></div>
         </div>
 
         <div className="modal-operators">
@@ -412,7 +412,6 @@ export default function App() {
                   {account.operators.map((operator, index) => <OperatorChip key={`${operator.name}-${index}`} operator={operator} sprite={catalog?.sprite ?? null} />)}
                 </div>
                 <div className="price-block">
-                  <span>아이디팜 최종 결제가</span>
                   <strong>{formatPrice(idFarmPrice(account.price))}</strong>
                 </div>
                 <ChevronRight size={18} />
