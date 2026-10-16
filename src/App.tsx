@@ -181,7 +181,7 @@ export default function App() {
     const controller = new AbortController()
     const reportVisit = async () => {
       try {
-        const response = await fetch(`${VISITOR_API_URL.replace(/\/$/, '')}/visit`, {
+        const response = await fetch(`${VISITOR_API_URL.replace(/\/$/, '')}/visit/idfarm`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ visitor_id: getVisitorId() }),
