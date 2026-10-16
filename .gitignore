@@ -1,0 +1,14 @@
+node_modules/
+dist/
+*.log
+*.local
+.env
+.env.*
+!.env.example
+.wrangler/
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+/public/
+
