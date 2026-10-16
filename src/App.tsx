@@ -47,7 +47,7 @@ type VisitorStats = {
   total: number
 }
 
-const IDFARM_URL = 'https://idfarm.co.kr/ItemMarket/gameItem/1438924'
+const IDFARM_URL = 'https://idfarm.co.kr/ItemMarket/gameItem/1543613'
 const CATALOG_BASE_URL = 'https://mbreset.github.io/arknights-accounts-search/'
 const PAGE_SIZE = 60
 const VISITOR_API_URL = import.meta.env.VITE_VISITOR_API_URL?.trim()
@@ -120,7 +120,6 @@ function AccountModal({ account, sprite, onClose }: { account: PublicAccount; sp
         </header>
 
         <div className="modal-price-strip">
-          <div><span>오픈카톡 판매가</span><strong>{formatPrice(account.price)}</strong></div>
           <div><span>아이디팜 최종 결제가</span><strong>{formatPrice(idFarmPrice(account.price))}</strong><small>수수료 5% 적용</small></div>
         </div>
 
@@ -254,7 +253,8 @@ export default function App() {
     const maximum = Number(maxPrice) || Number.POSITIVE_INFINITY
     const accountNumberQuery = /^\d+$/.test(searchText.trim()) ? searchText.trim() : ''
     const filtered = (catalog?.accounts ?? []).filter((account) => {
-      if (account.price < minimum || account.price > maximum) return false
+      const price = idFarmPrice(account.price)
+      if (price < minimum || price > maximum) return false
       if (accountNumberQuery && !account.account_number.includes(accountNumberQuery)) return false
       if (!selectedOperators.length) return true
       return matchesOperatorTerms(account.operators, selectedOperators, searchMode)
@@ -262,7 +262,7 @@ export default function App() {
     if (sort === 'legacy') return direction === 'desc' ? filtered : [...filtered].reverse()
     return [...filtered].sort((left, right) => {
       const compared = sort === 'price'
-        ? left.price - right.price
+        ? idFarmPrice(left.price) - idFarmPrice(right.price)
         : Number(left.account_number) - Number(right.account_number)
       return direction === 'asc' ? compared : -compared
     })
@@ -412,9 +412,8 @@ export default function App() {
                   {account.operators.map((operator, index) => <OperatorChip key={`${operator.name}-${index}`} operator={operator} sprite={catalog?.sprite ?? null} />)}
                 </div>
                 <div className="price-block">
-                  <span>판매가</span>
-                  <strong>{formatPrice(account.price)}</strong>
-                  <small>아이디팜 {formatPrice(idFarmPrice(account.price))}</small>
+                  <span>아이디팜 최종 결제가</span>
+                  <strong>{formatPrice(idFarmPrice(account.price))}</strong>
                 </div>
                 <ChevronRight size={18} />
               </button>

@@ -43,17 +43,35 @@ const mount = async (withPotential = false) => {
   }
 }
 const tests = [
-  ['Only IDFarm purchase links are present while both price displays remain', async () => {
+  ['Only IDFarm purchase links and final prices are displayed', async () => {
     await mount()
-    assert(document.querySelector('.site-footer a').href === 'https://idfarm.co.kr/ItemMarket/gameItem/1438924', 'Footer purchase target changed')
-    assert(document.querySelector('.price-block').textContent === '판매가10,000원아이디팜 10,500원', 'List prices changed')
+    assert(document.querySelector('.site-footer a').href === 'https://idfarm.co.kr/ItemMarket/gameItem/1543613', 'Footer purchase target changed')
+    assert(document.querySelector('.price-block').textContent === '아이디팜 최종 결제가10,500원', 'List must show final price only')
     await act(() => document.querySelector('.account-row').click())
     const links = [...document.querySelectorAll('a')]
-    assert(links.length === 2 && links.every(a => a.href === 'https://idfarm.co.kr/ItemMarket/gameItem/1438924'), 'Only IDFarm links are allowed')
-    assert(document.querySelectorAll('.modal-price-strip strong').length === 2, 'Both original prices must remain')
-    assert(document.querySelector('.modal-price-strip').textContent.includes('오픈카톡 판매가10,000원'), 'Base price changed')
+    assert(links.length === 2 && links.every(a => a.href === 'https://idfarm.co.kr/ItemMarket/gameItem/1543613'), 'Only IDFarm links are allowed')
+    assert(document.querySelectorAll('.modal-price-strip strong').length === 1, 'Modal must show one price')
+    assert(document.querySelector('.modal-price-strip').textContent === '아이디팜 최종 결제가10,500원수수료 5% 적용', 'Modal final price incorrect')
+    assert(!document.body.textContent.includes('오픈카톡'), 'Kakao price label remains')
     assert(!document.querySelector('a[href*="kakao"]'), 'Kakao link remains')
     await click('닫기')
+  }],
+  ['Price filters use the displayed IDFarm final price including boundaries', async () => {
+    await mount()
+    const inputs = document.querySelectorAll('.filter-row input')
+    const setPrice = async (input, value) => act(() => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, value)
+      input.dispatchEvent(new Event('input', {bubbles:true}))
+    })
+    await setPrice(inputs[1], '10499')
+    assert(resultIds().length === 0, 'Maximum used base price instead of final price')
+    await setPrice(inputs[1], '10500')
+    assert(resultIds().length === 5, 'Exact maximum must include final price')
+    await setPrice(inputs[0], '10500')
+    assert(resultIds().length === 5, 'Exact minimum must include final price')
+    await setPrice(inputs[1], '')
+    await setPrice(inputs[0], '10501')
+    assert(resultIds().length === 0, 'Minimum must exclude lower final price')
   }],
   ['Potential search checkbox is visible immediately and enables per-operator controls', async () => {
     await mount(); await type('토가'); await key('Enter')
